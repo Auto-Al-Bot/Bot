@@ -2578,55 +2578,50 @@
         }
 
         // =======================================================
-        // 12. INITIALIZATION
-        // =======================================================
+// 12. INITIALIZATION
+// =======================================================
 
-        function initializeApp() {
-            loadState();
-            
-            // PWA Setup
-            generatePwaFiles();
+function initializeApp() {
+    loadState();
+    
+    // PWA Setup
+    generatePwaFiles();
 
-            // Check if logged in to determine initial page
-            let initialPage;
-            if (appState.isLoggedIn) {
-                initialPage = appState.currentPage === 'landingPage' ? 'home' : appState.currentPage;
-            } else {
-                initialPage = 'landingPage';
-            }
-            
-            // Load initial market data for landing page or home if needed
-            fetchMarketData(initialPage === 'landingPage' ? 'landingPage' : 'home');
+    // Always show landingPage on load
+    let initialPage = 'landingPage';
 
-            // Show the correct initial page
-            showPage(initialPage, true);
+    // Load initial market data for landing page
+    fetchMarketData('landingPage');
 
-            // Start persistent timers for ongoing activities
-            if (appState.isLoggedIn) {
-                if (appState.trade.active) startTradeCountdown();
-                if (appState.withdrawal.status === 'Processing' || appState.withdrawal.status === 'Suspended') startWithdrawalCountdown();
-                checkWithdrawalSuspension();
-            }
+    // Show the correct initial page
+    showPage(initialPage, true);
 
-            // Periodic background tasks
-            setInterval(() => {
-                if (appState.isLoggedIn) {
-                    renderHomeUI(); // Updates balance, holdings, activities, suspension banner
-                }
-            }, 5000); // UI refresh every 5s
+    // Start persistent timers for ongoing activities
+    if (appState.isLoggedIn) {
+        if (appState.trade.active) startTradeCountdown();
+        if (appState.withdrawal.status === 'Processing' || appState.withdrawal.status === 'Suspended') startWithdrawalCountdown();
+        checkWithdrawalSuspension();
+    }
 
-            setInterval(() => fetchMarketData(appState.currentPage === 'marketPage' ? 'marketPage' : 'home'), 60000); // Market data refresh every 60s
-            setInterval(loadDailyMarketUpdates, 12 * 60 * 60 * 1000); // News check every 12 hours
-            
-            // Initial call for daily updates (will check timestamp)
-            loadDailyMarketUpdates(); 
-            
-            // Setup listener for trade asset buttons (since they are static HTML)
-            setupTradeAssetListeners();
+    // Periodic background tasks
+    setInterval(() => {
+        if (appState.isLoggedIn) {
+            renderHomeUI(); // Updates balance, holdings, activities, suspension banner
         }
+    }, 5000); // UI refresh every 5s
 
-        window.onload = initializeApp;
+    setInterval(() => fetchMarketData(appState.currentPage === 'marketPage' ? 'marketPage' : 'home'), 60000); // Market data refresh every 60s
+    setInterval(loadDailyMarketUpdates, 12 * 60 * 60 * 1000); // News check every 12 hours
+    
+    // Initial call for daily updates (will check timestamp)
+    loadDailyMarketUpdates(); 
+    
+    // Setup listener for trade asset buttons (since they are static HTML)
+    setupTradeAssetListeners();
+}
 
-    </script>
+window.onload = initializeApp;
+
+</script>
 </body>
 </html>
